@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact | ReCore</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">ReCore</div>
+        <nav>
+    <a href="index.html">Accueil</a>
+    <a href="brand.html">Brand</a>
+    <a href="produits.html">Produits</a>
+    <a href="contact.html">Contact</a>
+    <a href="compte.html">Mon compte</a>
+</nav>
+
+    </header>
+
+    <section class="page-hero">
+        <h1 class="fade-in">Contact ReCore</h1>
+        <p class="fade-in delay">Prenez une décision. Parlons-en.</p>
+    </section>
+
+    <section class="contact-section reveal">
+        <form class="contact-form">
+            <input type="text" placeholder="Votre nom" required>
+            <input type="email" placeholder="Votre email" required>
+            <textarea placeholder="Votre message" required></textarea>
+            <button type="submit" class="btn">Envoyer</button>
+        </form>
+    </section>
+
+    <script>
+        const reveals = document.querySelectorAll(".reveal");
+
+        window.addEventListener("scroll", () => {
+            reveals.forEach(el => {
+                const windowHeight = window.innerHeight;
+                const elementTop = el.getBoundingClientRect().top;
+                const elementVisible = 100;
+
+                if (elementTop < windowHeight - elementVisible) {
+                    el.classList.add("active");
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

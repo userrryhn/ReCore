@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>ReCore</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">ReCore</div>
+        <nav>
+    <a href="index.html">Accueil</a>
+    <a href="brand.html">Brand</a>
+    <a href="produits.html">Produits</a>
+    <a href="contact.html">Contact</a>
+    <a href="compte.html">Mon compte</a>
+</nav>
+
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="fade-in">ReCore.</h1>
+            <p class="fade-in delay">Recentrer. Décider. Avancer.</p>
+            <button class="btn fade-in delay-2" onclick="goToProducts()">
+                Découvrir
+            </button>
+        </div>
+    </section>
+
+    <section class="section reveal">
+        <h2>Revenir à l’essentiel</h2>
+        <p>ReCore incarne la prise de décision audacieuse et réfléchie.</p>
+    </section>
+
+    <section class="section reveal">
+        <h2>Construire avec intention</h2>
+        <p>Chaque action est pensée. Chaque choix est assumé.</p>
+    </section>
+
+    <script>
+        const reveals = document.querySelectorAll(".reveal");
+
+        window.addEventListener("scroll", () => {
+            reveals.forEach(el => {
+                const windowHeight = window.innerHeight;
+                const elementTop = el.getBoundingClientRect().top;
+                const elementVisible = 100;
+
+                if (elementTop < windowHeight - elementVisible) {
+                    el.classList.add("active");
+                }
+            });
+        });
+
+        function goToProducts() {
+            document.body.classList.add("fade-out");
+
+            setTimeout(() => {
+                window.location.href = "produits.html";
+            }, 500);
+        }
+    </script>
+
+</body>
+</html>

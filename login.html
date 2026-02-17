@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Connexion | ReCore</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="logo">ReCore
+    </div>
+    <nav>
+        <a href="index.html">Accueil</a>
+        <a href="produits.html">Produits</a>
+        <a href="register.html">Inscription</a>
+    </nav>
+</header>
+
+<section class="page-hero">
+    <h1>Connexion</h1>
+</section>
+
+<section class="contact-section">
+    <div class="contact-form">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Mot de passe" required>
+        <button class="btn" onclick="login()">Se connecter</button>
+    </div>
+</section>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBvmqa7MUYKePUHSYq69XmhN9N7GdNvlPU",
+  authDomain: "recore-f320c.firebaseapp.com",
+  projectId: "recore-f320c",
+  storageBucket: "recore-f320c.firebasestorage.app",
+  messagingSenderId: "560442114914",
+  appId: "1:560442114914:web:9c2bf7f43f3336954ca23b"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+window.login = async function() {
+    try {
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        await signInWithEmailAndPassword(auth, email, password);
+
+        alert("Connexion réussie !");
+        window.location.href = "compte.html";
+
+    } catch (error) {
+        alert("Erreur : " + error.message);
+    }
+}
+</script>
+
+</body>
+</html>

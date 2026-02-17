@@ -1,0 +1,518 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+/* RESET */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #0d0d0f;
+    color: #f5f5f7;
+    overflow-x: hidden;
+    transition: opacity 0.5s ease;
+}
+
+/* ================= NAVBAR ================= */
+
+.navbar {
+    position: fixed;
+    width: 100%;
+    padding: 20px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    background: rgba(20,20,25,0.7);
+    z-index: 1000;
+}
+
+.navbar nav a {
+    text-decoration: none;
+    color: #f5f5f7;
+    font-weight: 500;
+    transition: opacity 0.3s ease;
+}
+
+.navbar nav a:not(:first-child) {
+    margin-left: 30px;
+}
+
+.navbar nav a:hover {
+    opacity: 0.5;
+}
+
+/* ================= HERO ================= */
+
+.hero {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(180deg, #0d0d0f 0%, #16161a 100%);
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    color: #a1a1aa;
+}
+
+/* ================= BUTTON ================= */
+
+.btn {
+    padding: 14px 32px;
+    border: none;
+    border-radius: 30px;
+    background: #f5f5f7;
+    color: #000;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+    background: #ddd;
+}
+
+/* ================= SECTIONS ================= */
+
+.section {
+    padding: 120px 20px;
+    text-align: center;
+}
+
+.section h2 {
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+}
+
+.section p {
+    color: #a1a1aa;
+    font-size: 1.1rem;
+}
+
+/* ================= PAGE HERO (Produits / Brand) ================= */
+
+.page-hero {
+    padding-top: 140px;
+    padding-bottom: 80px;
+    text-align: center;
+    background: linear-gradient(180deg, #0d0d0f 0%, #16161a 100%);
+}
+
+.page-hero h1 {
+    font-size: 2.8rem;
+    margin-bottom: 10px;
+}
+
+.page-hero p {
+    color: #a1a1aa;
+}
+
+/* ================= PRODUCTS GRID ================= */
+
+.products-grid {
+    padding: 60px 80px 120px 80px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+}
+
+/* ================= PRODUCT CARD ================= */
+
+.product-card {
+    background: #1c1c22;
+    padding: 40px 20px;
+    border-radius: 20px;
+    text-align: center;
+    transition: all 0.4s ease;
+    cursor: pointer;
+}
+
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.product-img {
+    height: 200px;
+    background: #2a2a33;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.product-card h3 {
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.product-card p {
+    color: #a1a1aa;
+    margin-bottom: 15px;
+}
+
+.price {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Bouton uniquement dans les cards */
+.product-card .btn {
+    width: 100%;
+}
+
+/* ================= CONTACT ================= */
+
+.contact-section {
+    padding: 60px 20px 120px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.contact-form {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.contact-form input,
+.contact-form textarea {
+    padding: 15px 20px;
+    border-radius: 15px;
+    border: 1px solid #2a2a33;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    outline: none;
+    background: #1c1c22;
+    color: #f5f5f7;
+}
+
+.contact-form textarea {
+    resize: none;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    border-color: #f5f5f7;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.05);
+}
+
+/* ================= ANIMATIONS ================= */
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 1s ease forwards;
+}
+
+.delay {
+    animation-delay: 0.3s;
+}
+
+.delay-2 {
+    animation-delay: 0.6s;
+}
+
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 1s ease;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ================= PAGE TRANSITION ================= */
+
+body.fade-out {
+    opacity: 0;
+}
+
+/* ================= CATEGORIES ================= */
+
+.categories {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 40px 20px;
+}
+
+.category-btn {
+    padding: 10px 20px;
+    border-radius: 30px;
+    border: 1px solid #2a2a33;
+    background: transparent;
+    color: #f5f5f7;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.category-btn:hover {
+    background: #f5f5f7;
+    color: #000;
+}
+
+.category-btn.active {
+    background: #f5f5f7;
+    color: #000;
+}
+
+/* ===================== */
+/* ACCOUNT PAGE DESIGN */
+/* ===================== */
+
+.account-card {
+    max-width: 520px;
+    margin: 60px auto;
+    padding: 40px;
+    background: #1c1c22;
+    border-radius: 25px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    animation: fadeUp 0.8s ease forwards;
+}
+
+.account-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #2a2a33;
+    font-size: 1.1rem;
+}
+
+.account-row:last-child {
+    border-bottom: none;
+}
+
+.label {
+    font-weight: 600;
+    color: #a1a1aa;
+}
+
+.badge {
+    margin-left: 12px;
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge.verified {
+    background: #16a34a;
+    color: white;
+}
+
+.badge.not-verified {
+    background: #dc2626;
+    color: white;
+}
+
+.account-actions {
+    margin-top: 35px;
+    text-align: center;
+}
+
+/* ================= ACCOUNT PAGE ================= */
+
+.account-card {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 50px;
+    background: #1c1c22;
+    border-radius: 25px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+}
+
+.account-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid #2a2a33;
+}
+
+.account-row:last-child {
+    border-bottom: none;
+}
+
+.label {
+    font-weight: 600;
+    color: #a1a1aa;
+}
+
+.account-row input {
+    background: transparent;
+    border: none;
+    color: #f5f5f7;
+    text-align: right;
+    font-size: 1rem;
+    width: 60%;
+}
+
+.account-row input:disabled {
+    opacity: 0.8;
+}
+
+.email-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge.verified {
+    background: #16a34a;
+    color: white;
+}
+
+.badge.not-verified {
+    background: #dc2626;
+    color: white;
+}
+
+.account-actions {
+    margin-top: 35px;
+    text-align: center;
+}
+
+.account-actions .btn {
+    margin: 8px;
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+
+/* TABLETTE */
+@media (max-width: 1024px) {
+
+    .navbar {
+        padding: 20px 30px;
+    }
+
+    .products-grid {
+        padding: 40px;
+        gap: 30px;
+    }
+
+    .account-card {
+        margin: 40px 20px;
+        padding: 35px;
+    }
+
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+    /* NAVBAR */
+    .navbar {
+        flex-direction: column;
+        gap: 15px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .navbar nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .navbar nav a {
+        margin-left: 0;
+    }
+
+    /* HERO */
+    .hero-content h1,
+    .page-hero h1 {
+        font-size: 2rem;
+    }
+
+    /* PRODUCTS */
+    .products-grid {
+        grid-template-columns: 1fr;
+        padding: 30px 20px;
+    }
+
+    .product-card {
+        width: 100%;
+    }
+
+    /* ACCOUNT */
+    .account-card {
+        margin: 30px 15px;
+        padding: 25px;
+    }
+
+    .account-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .account-row input {
+        width: 100%;
+        text-align: left;
+    }
+
+    .email-container {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .account-actions .btn {
+        width: 100%;
+    }
+
+}
+
+/* PETITS TELEPHONES */
+@media (max-width: 480px) {
+
+    .hero-content h1,
+    .page-hero h1 {
+        font-size: 1.6rem;
+    }
+
+    .section {
+        padding: 80px 15px;
+    }
+
+}

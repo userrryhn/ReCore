@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Produits | ReCore</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="navbar">
+<div class="logo">ReCore</div>
+<nav>
+<a href="index.html">Accueil</a>
+<a href="brand.html">Brand</a>
+<a href="produits.html">Produits</a>
+<a href="contact.html">Contact</a>
+<a href="compte.html">Mon compte</a>
+</nav>
+</header>
+
+<section class="page-hero">
+<h1>Nos Produits</h1>
+<p>Choisis ton produit et passe à l'action.</p>
+</section>
+
+<section class="products-grid">
+
+<div class="product-card">
+<h3>Formation Business</h3>
+<p>Stratégie complète pour lancer ton projet.</p>
+<button class="btn" onclick="commander('Formation Business')">
+Commander
+</button>
+</div>
+
+<div class="product-card">
+<h3>Pack IA</h3>
+<p>Automatise ton business avec l'intelligence artificielle.</p>
+<button class="btn" onclick="commander('Pack IA')">
+Commander
+</button>
+</div>
+
+<div class="product-card">
+<h3>Logiciel Automation</h3>
+<p>Gagne du temps avec nos outils premium.</p>
+<button class="btn" onclick="commander('Logiciel Automation')">
+Commander
+</button>
+</div>
+
+</section>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, addDoc, collection } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* CONFIG FIREBASE */
+const firebaseConfig = {
+apiKey: "AIzaSyBvmqa7MUYKePUHSYq69XmhN9N7GdNvlPU",
+authDomain: "recore-f320c.firebaseapp.com",
+projectId: "recore-f320c",
+storageBucket: "recore-f320c.firebasestorage.app",
+messagingSenderId: "560442114914",
+appId: "1:560442114914:web:9c2bf7f43f3336954ca23b"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* FONCTION COMMANDER */
+
+window.commander = async function(produit) {
+
+const user = auth.currentUser;
+
+/* 1️⃣ Vérifie si connecté */
+if (!user) {
+alert("Connectez-vous pour commander.");
+window.location.href = "login.html";
+return;
+}
+
+/* 2️⃣ Vérifie si email validé */
+if (!user.emailVerified) {
+alert("Vérifiez votre email avant de commander.");
+return;
+}
+
+/* 3️⃣ Enregistre la commande */
+await addDoc(collection(db, "orders"), {
+userId: user.uid,
+produit: produit,
+date: new Date().toLocaleDateString(),
+statut: "En attente"
+});
+
+alert("Commande enregistrée avec succès !");
+}
+
+</script>
+
+</body>
+</html>
