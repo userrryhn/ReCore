@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Panier | ReCore</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+
+/* ===== PANIER ===== */
+
+.cart-page {
+    margin-top: 120px; /* espace pour navbar fixe */
+    padding: 0 20px 80px 20px;
+}
+
+.cart-container {
+    max-width: 900px;
+    margin: auto;
+    background: #1c1c22;
+    border-radius: 25px;
+    padding: 40px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+}
+
+.cart-title {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid #2a2a33;
+}
+
+.cart-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-name {
+    font-weight: 600;
+}
+
+.cart-price {
+    color: #a1a1aa;
+}
+
+.remove-btn {
+    background: transparent;
+    border: 1px solid #dc2626;
+    color: #dc2626;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.remove-btn:hover {
+    background: #dc2626;
+    color: white;
+}
+
+.cart-footer {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-total {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.cart-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.empty-message {
+    text-align: center;
+    color: #a1a1aa;
+    padding: 40px 0;
+}
+
+@media (max-width:768px) {
+
+    .cart-page {
+        margin-top: 100px;
+    }
+
+    .cart-footer {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .cart-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .cart-buttons .btn {
+        width: 100%;
+    }
+}
+
+</style>
+</head>
+<body>
+
+<header class="navbar">
+<div class="logo"><a href="index.html">ReCore</a></div>
+<nav>
+<a href="index.html">Accueil</a>
+<a href="produits.html">Produits</a>
+<a href="compte.html">Mon compte</a>
+</nav>
+</header>
+
+<div class="cart-page">
+
+<div class="cart-container">
+
+<h2 class="cart-title">Votre panier</h2>
+
+<div id="cart-items"></div>
+
+<div class="cart-footer">
+    <div class="cart-total">
+        Total : <span id="total">0</span> €
+    </div>
+
+    <div class="cart-buttons">
+        <button class="btn" onclick="clearCart()">Vider</button>
+        <button class="btn" onclick="checkout()">Paiement</button>
+    </div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+const container = document.getElementById("cart-items");
+const totalElement = document.getElementById("total");
+
+function renderCart() {
+
+    container.innerHTML = "";
+    let total = 0;
+
+    if (cart.length === 0) {
+        container.innerHTML = "<div class='empty-message'>Votre panier est vide.</div>";
+        totalElement.innerText = 0;
+        return;
+    }
+
+    cart.forEach((item, index) => {
+
+        total += item.price;
+
+        container.innerHTML += `
+        <div class="cart-item">
+            <div class="cart-left">
+                <span class="cart-name">${item.name}</span>
+                <span class="cart-price">${item.price} €</span>
+            </div>
+            <button class="remove-btn" onclick="removeItem(${index})">
+                Supprimer
+            </button>
+        </div>
+        `;
+    });
+
+    totalElement.innerText = total;
+}
+
+function removeItem(index) {
+    cart.splice(index, 1);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+}
+
+function clearCart() {
+    cart = [];
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+}
+
+function checkout() {
+    if(cart.length === 0) return;
+    alert("Prochaine étape : Stripe 🔥");
+}
+
+renderCart();
+
+</script>
+
+</body>
+</html>

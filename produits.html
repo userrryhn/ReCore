@@ -5,17 +5,58 @@
 <title>Produits | ReCore</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="css/style.css">
+
+<style>
+
+/* ===== PANIER NAVBAR ===== */
+
+.cart-inline {
+    cursor: pointer;
+    margin-left: 25px;
+    font-weight: 600;
+    position: relative;
+    text-decoration: none;
+    color: #f5f5f7;
+}
+
+.cart-count {
+    background: #16a34a;
+    color: white;
+    border-radius: 50%;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    margin-left: 6px;
+}
+
+/* Animation bouton */
+.added {
+    animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+</style>
 </head>
 <body>
 
 <header class="navbar">
 <div class="logo">ReCore</div>
+
 <nav>
 <a href="index.html">Accueil</a>
 <a href="brand.html">Brand</a>
 <a href="produits.html">Produits</a>
 <a href="contact.html">Contact</a>
 <a href="compte.html">Mon compte</a>
+
+<a href="panier.html" class="cart-inline">
+🛒 <span class="cart-count" id="cart-count">0</span>
+</a>
+
 </nav>
 </header>
 
@@ -29,77 +70,53 @@
 <div class="product-card">
 <h3>Formation Business</h3>
 <p>Stratégie complète pour lancer ton projet.</p>
-<button class="btn" onclick="commander('Formation Business')">
-Commander
+<button class="btn" onclick="addToCart(event,'Formation Business',199)">
+Ajouter au panier
 </button>
 </div>
 
 <div class="product-card">
 <h3>Pack IA</h3>
 <p>Automatise ton business avec l'intelligence artificielle.</p>
-<button class="btn" onclick="commander('Pack IA')">
-Commander
+<button class="btn" onclick="addToCart(event,'Pack IA',149)">
+Ajouter au panier
 </button>
 </div>
 
 <div class="product-card">
 <h3>Logiciel Automation</h3>
 <p>Gagne du temps avec nos outils premium.</p>
-<button class="btn" onclick="commander('Logiciel Automation')">
-Commander
+<button class="btn" onclick="addToCart(event,'Logiciel Automation',99)">
+Ajouter au panier
 </button>
 </div>
 
 </section>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, addDoc, collection } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script>
 
-/* CONFIG FIREBASE */
-const firebaseConfig = {
-apiKey: "AIzaSyBvmqa7MUYKePUHSYq69XmhN9N7GdNvlPU",
-authDomain: "recore-f320c.firebaseapp.com",
-projectId: "recore-f320c",
-storageBucket: "recore-f320c.firebasestorage.app",
-messagingSenderId: "560442114914",
-appId: "1:560442114914:web:9c2bf7f43f3336954ca23b"
-};
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-/* FONCTION COMMANDER */
-
-window.commander = async function(produit) {
-
-const user = auth.currentUser;
-
-/* 1️⃣ Vérifie si connecté */
-if (!user) {
-alert("Connectez-vous pour commander.");
-window.location.href = "login.html";
-return;
+function updateCartCount() {
+    document.getElementById("cart-count").innerText = cart.length;
 }
 
-/* 2️⃣ Vérifie si email validé */
-if (!user.emailVerified) {
-alert("Vérifiez votre email avant de commander.");
-return;
-}
+updateCartCount();
 
-/* 3️⃣ Enregistre la commande */
-await addDoc(collection(db, "orders"), {
-userId: user.uid,
-produit: produit,
-date: new Date().toLocaleDateString(),
-statut: "En attente"
-});
+function addToCart(event, name, price) {
 
-alert("Commande enregistrée avec succès !");
+    cart.push({ name, price });
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    updateCartCount();
+
+    const button = event.target;
+    button.classList.add("added");
+
+    setTimeout(() => {
+        button.classList.remove("added");
+    }, 400);
 }
 
 </script>
