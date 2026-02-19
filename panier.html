@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="css/style.css">
 
 <style>
-
 /* ===== PANIER ===== */
 
 .cart-page {
@@ -89,7 +88,6 @@
 }
 
 @media (max-width:768px) {
-
     .cart-page {
         margin-top: 100px;
     }
@@ -108,10 +106,9 @@
         width: 100%;
     }
 }
-
 </style>
 </head>
-<body>
+<body class="panier-page">
 
 <header class="navbar">
 <div class="logo"><a href="index.html">ReCore</a></div>
@@ -123,37 +120,30 @@
 </header>
 
 <div class="cart-page">
+    <div class="cart-container">
+        <h2 class="cart-title">Votre panier</h2>
+        <div id="cart-items"></div>
 
-<div class="cart-container">
+        <div class="cart-footer">
+            <div class="cart-total">
+                Total : <span id="total">0</span> €
+            </div>
 
-<h2 class="cart-title">Votre panier</h2>
-
-<div id="cart-items"></div>
-
-<div class="cart-footer">
-    <div class="cart-total">
-        Total : <span id="total">0</span> €
+            <div class="cart-buttons">
+                <button class="btn" onclick="clearCart()">Vider</button>
+                <button class="btn" onclick="checkout()">Paiement</button>
+            </div>
+        </div>
     </div>
-
-    <div class="cart-buttons">
-        <button class="btn" onclick="clearCart()">Vider</button>
-        <button class="btn" onclick="checkout()">Paiement</button>
-    </div>
-</div>
-
-</div>
-
 </div>
 
 <script>
-
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 const container = document.getElementById("cart-items");
 const totalElement = document.getElementById("total");
 
 function renderCart() {
-
     container.innerHTML = "";
     let total = 0;
 
@@ -164,8 +154,7 @@ function renderCart() {
     }
 
     cart.forEach((item, index) => {
-
-        total += item.price;
+        total += Number(item.price) || 0;
 
         container.innerHTML += `
         <div class="cart-item">
@@ -195,13 +184,53 @@ function clearCart() {
     renderCart();
 }
 
-function checkout() {
-    if(cart.length === 0) return;
-    alert("Prochaine étape : Stripe 🔥");
+async function checkout() {
+    if (cart.length === 0) return;
+
+    try {
+        const res = await fetch("http://localhost:4242/create-checkout-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cart })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.error || "Erreur paiement.");
+            return;
+        }
+
+        window.location.href = data.url;
+    } catch (e) {
+        alert("Impossible de contacter le serveur de paiement.");
+    }
 }
 
 renderCart();
+</script>
 
+<script>
+window.addEventListener("load", () => {
+    document.body.classList.add("page-loaded");
+});
+
+document.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", function(e) {
+        const href = this.getAttribute("href");
+
+        if (!href || href.startsWith("#") || href.startsWith("http")) return;
+
+        e.preventDefault();
+
+        document.body.classList.remove("page-loaded");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = href;
+        }, 400);
+    });
+});
 </script>
 
 </body>

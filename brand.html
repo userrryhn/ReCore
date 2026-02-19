@@ -1,57 +1,190 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Brand - Ma Marque</title>
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<title>Brand - ReCore</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
+
 <header class="navbar">
-        <div class="logo">ReCore</div>
-        <nav>
-            <nav>
-    <a href="index.html">Accueil</a>
-    <a href="brand.html">Brand</a>
-    <a href="produits.html">Produits</a>
-    <a href="contact.html">Contact</a>
-    <a href="compte.html">Mon compte</a>
-</nav>
+    <div class="logo">ReCore</div>
+    <nav>
+        <a href="index.html">Accueil</a>
+        <a href="brand.html">Brand</a>
+        <a href="produits.html">Produits</a>
+        <a href="contact.html">Contact</a>
+        <a href="compte.html">Mon compte</a>
 
-        </nav>
-    </header>
+        <a href="panier.html" class="cart-inline">
+            🛒 <span class="cart-count" id="cart-count">0</span>
+        </a>
+    </nav>
+</header>
 
-  <section class="page-hero">
+<section class="page-hero">
     <h1>Notre Collection</h1>
     <p>Les pièces officielles de la marque</p>
-  </section>
+</section>
 
-  <section class="products-grid">
+<section class="section">
 
-    <div class="product-card">
-      <div class="product-img"></div>
-      <h3>Hoodie Oversize</h3>
-      <p>Coupe large, coton premium 400g</p>
-      <span class="price">89€</span>
-      <button class="btn">Acheter</button>
+    <div class="brand-item">
+        <div class="brand-img"></div>
+        <div class="brand-content">
+            <h2>Hoodie Oversize</h2>
+            <p>
+                Coupe large, coton premium 400g.
+                Pensé pour le confort et la présence.
+            </p>
+            <span class="price">89€</span>
+            <button class="btn" onclick="addToCart('Hoodie Oversize', 89)">
+                Ajouter au panier
+            </button>
+        </div>
     </div>
 
-    <div class="product-card">
-      <div class="product-img"></div>
-      <h3>T-Shirt Signature</h3>
-      <p>Logo brodé, coupe droite</p>
-      <span class="price">45€</span>
-      <button class="btn">Acheter</button>
+    <div class="brand-item reverse">
+        <div class="brand-img"></div>
+        <div class="brand-content">
+            <h2>T-Shirt Signature</h2>
+            <p>
+                Logo brodé minimaliste.
+                Coupe droite, équilibre parfait.
+            </p>
+            <span class="price">45€</span>
+            <button class="btn" onclick="addToCart('T-Shirt Signature', 45)">
+                Ajouter au panier
+            </button>
+        </div>
     </div>
 
-    <div class="product-card">
-      <div class="product-img"></div>
-      <h3>Jogging Premium</h3>
-      <p>Confort max, coupe ajustée</p>
-      <span class="price">75€</span>
-      <button class="btn">Acheter</button>
+    <div class="brand-item">
+        <div class="brand-img"></div>
+        <div class="brand-content">
+            <h2>Jogging Premium</h2>
+            <p>
+                Confort maximal.
+                Coupe ajustée et matière respirante.
+            </p>
+            <span class="price">75€</span>
+            <button class="btn" onclick="addToCart('Jogging Premium', 75)">
+                Ajouter au panier
+            </button>
+        </div>
     </div>
 
-  </section>
+</section>
 
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<script type="module">
+
+/* ================= FIREBASE ================= */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBvmqa7MUYKePUHSYq69XmhN9N7GdNvlPU",
+  authDomain: "recore-f320c.firebaseapp.com",
+  projectId: "recore-f320c",
+  storageBucket: "recore-f320c.firebasestorage.app",
+  messagingSenderId: "560442114914",
+  appId: "1:560442114914:web:9c2bf7f43f3336954ca23b"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+let currentUser = null;
+
+onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+});
+
+/* ================= PAGE TRANSITION ================= */
+
+window.addEventListener("load", () => {
+    document.body.classList.add("page-loaded");
+});
+
+document.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", function(e) {
+        const href = this.getAttribute("href");
+
+        if (!href || href.startsWith("#") || href.startsWith("http")) return;
+
+        e.preventDefault();
+
+        document.body.classList.remove("page-loaded");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = href;
+        }, 400);
+    });
+});
+
+/* ================= PANIER ================= */
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function updateCartCount() {
+    document.getElementById("cart-count").innerText = cart.length;
+}
+
+updateCartCount();
+
+window.addToCart = function(name, price) {
+
+    if (!currentUser) {
+        showToast("Connexion requise 🚫", "error");
+
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 1000);
+
+        return;
+    }
+
+    cart.push({ name, price });
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateCartCount();
+
+    showToast("Produit ajouté au panier ✔", "success");
+};
+
+
+/* ================= TOAST ================= */
+
+function showToast(message, type) {
+
+    const toast = document.getElementById("toast");
+
+    toast.innerText = message;
+
+    toast.classList.remove("success", "error", "shake");
+    toast.classList.add("show");
+
+    if (type === "success") {
+        toast.classList.add("success");
+    }
+
+    if (type === "error") {
+        toast.classList.add("error");
+        toast.classList.add("shake");
+    }
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
+}
+
+</script>
 </body>
 </html>

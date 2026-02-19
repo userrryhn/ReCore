@@ -7,9 +7,6 @@
 <link rel="stylesheet" href="css/style.css">
 
 <style>
-
-/* ===== PANIER NAVBAR ===== */
-
 .cart-inline {
     cursor: pointer;
     margin-left: 25px;
@@ -28,10 +25,7 @@
     margin-left: 6px;
 }
 
-/* Animation bouton */
-.added {
-    animation: pop 0.4s ease;
-}
+.added { animation: pop 0.4s ease; }
 
 @keyframes pop {
     0% { transform: scale(1); }
@@ -39,13 +33,68 @@
     100% { transform: scale(1); }
 }
 
+.product-showcase {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 80px;
+    margin-bottom: 140px;
+}
+
+.product-showcase.reverse { flex-direction: row-reverse; }
+.showcase-content { flex: 1; }
+
+.showcase-content h2 {
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+}
+
+.showcase-content p {
+    color: #a1a1aa;
+    line-height: 1.7;
+    margin-bottom: 25px;
+    max-width: 500px;
+}
+
+.showcase-content .price {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.showcase-visual {
+    flex: 1;
+    height: 350px;
+    background: linear-gradient(135deg, #1c1c22, #2a2a33);
+    border-radius: 25px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    transition: transform 0.4s ease;
+}
+
+.showcase-visual:hover { transform: scale(1.03); }
+
+@media (max-width: 900px) {
+    .product-showcase,
+    .product-showcase.reverse {
+        flex-direction: column;
+        text-align: center;
+        gap: 40px;
+    }
+
+    .showcase-content p { max-width: 100%; }
+
+    .showcase-visual {
+        width: 100%;
+        height: 220px;
+    }
+}
 </style>
 </head>
 <body>
 
 <header class="navbar">
 <div class="logo">ReCore</div>
-
 <nav>
 <a href="index.html">Accueil</a>
 <a href="brand.html">Brand</a>
@@ -56,7 +105,6 @@
 <a href="panier.html" class="cart-inline">
 🛒 <span class="cart-count" id="cart-count">0</span>
 </a>
-
 </nav>
 </header>
 
@@ -65,60 +113,133 @@
 <p>Choisis ton produit et passe à l'action.</p>
 </section>
 
-<section class="products-grid">
+<section class="section">
+    <div class="product-showcase">
+        <div class="showcase-content">
+            <h2>Formation Business</h2>
+            <p>Stratégie complète pour lancer ton projet. Méthodes concrètes, frameworks actionnables, mentalité orientée résultats.</p>
+            <span class="price">199€</span>
+            <button class="btn" onclick="addToCart(event,'Formation Business',199)">Ajouter au panier</button>
+        </div>
+        <div class="showcase-visual"></div>
+    </div>
 
-<div class="product-card">
-<h3>Formation Business</h3>
-<p>Stratégie complète pour lancer ton projet.</p>
-<button class="btn" onclick="addToCart(event,'Formation Business',199)">
-Ajouter au panier
-</button>
-</div>
+    <div class="product-showcase reverse">
+        <div class="showcase-content">
+            <h2>Pack IA</h2>
+            <p>Automatise ton business avec l'intelligence artificielle. Prompts, systèmes, automatisations clés en main.</p>
+            <span class="price">149€</span>
+            <button class="btn" onclick="addToCart(event,'Pack IA',149)">Ajouter au panier</button>
+        </div>
+        <div class="showcase-visual"></div>
+    </div>
 
-<div class="product-card">
-<h3>Pack IA</h3>
-<p>Automatise ton business avec l'intelligence artificielle.</p>
-<button class="btn" onclick="addToCart(event,'Pack IA',149)">
-Ajouter au panier
-</button>
-</div>
-
-<div class="product-card">
-<h3>Logiciel Automation</h3>
-<p>Gagne du temps avec nos outils premium.</p>
-<button class="btn" onclick="addToCart(event,'Logiciel Automation',99)">
-Ajouter au panier
-</button>
-</div>
-
+    <div class="product-showcase">
+        <div class="showcase-content">
+            <h2>Logiciel Automation</h2>
+            <p>Gagne du temps avec nos outils premium. Structure, performance, efficacité maximale.</p>
+            <span class="price">99€</span>
+            <button class="btn" onclick="addToCart(event,'Logiciel Automation',99)">Ajouter au panier</button>
+        </div>
+        <div class="showcase-visual"></div>
+    </div>
 </section>
 
-<script>
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBvmqa7MUYKePUHSYq69XmhN9N7GdNvlPU",
+  authDomain: "recore-f320c.firebaseapp.com",
+  projectId: "recore-f320c",
+  storageBucket: "recore-f320c.firebasestorage.app",
+  messagingSenderId: "560442114914",
+  appId: "1:560442114914:web:9c2bf7f43f3336954ca23b"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+let currentUser = null;
+let authReady = false;
+
+onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    authReady = true;
+});
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 function updateCartCount() {
     document.getElementById("cart-count").innerText = cart.length;
 }
-
 updateCartCount();
 
-function addToCart(event, name, price) {
+window.addToCart = function(event, name, price) {
+    if (!authReady) {
+        showToast("Chargement de la session...", "error");
+        return;
+    }
+
+    const user = currentUser || auth.currentUser;
+
+    if (!user) {
+        showToast("Connexion requise 🚫", "error");
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 1000);
+        return;
+    }
 
     cart.push({ name, price });
-
     localStorage.setItem("cart", JSON.stringify(cart));
-
     updateCartCount();
 
-    const button = event.target;
+    const button = event.currentTarget || event.target;
     button.classList.add("added");
+    setTimeout(() => button.classList.remove("added"), 400);
 
-    setTimeout(() => {
-        button.classList.remove("added");
-    }, 400);
+    showToast("Produit ajouté au panier ✔", "success");
+};
+
+function showToast(message, type) {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.classList.remove("success", "error", "shake");
+    toast.classList.add("show");
+
+    if (type === "success") toast.classList.add("success");
+    if (type === "error") {
+        toast.classList.add("error");
+        toast.classList.add("shake");
+    }
+
+    setTimeout(() => toast.classList.remove("show"), 2500);
 }
+</script>
 
+<script>
+window.addEventListener("load", () => {
+    document.body.classList.add("page-loaded");
+});
+
+document.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", function(e) {
+        const href = this.getAttribute("href");
+        if (!href || href.startsWith("#") || href.startsWith("http")) return;
+
+        e.preventDefault();
+        document.body.classList.remove("page-loaded");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = href;
+        }, 400);
+    });
+});
 </script>
 
 </body>

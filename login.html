@@ -9,8 +9,7 @@
 <body>
 
 <header class="navbar">
-    <div class="logo">ReCore
-    </div>
+    <div class="logo">ReCore</div>
     <nav>
         <a href="index.html">Accueil</a>
         <a href="produits.html">Produits</a>
@@ -26,14 +25,26 @@
     <div class="contact-form">
         <input type="email" id="email" placeholder="Email" required>
         <input type="password" id="password" placeholder="Mot de passe" required>
+
         <button class="btn" onclick="login()">Se connecter</button>
+
+        <p style="margin-top:15px; font-size:0.9rem;">
+            <a href="#" onclick="resetPassword()" style="color:#a1a1aa; text-decoration:none;">
+                Mot de passe oublié ?
+            </a>
+        </p>
     </div>
 </section>
 
+<div id="toast" class="toast"></div>
+
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } 
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+/* ================= FIREBASE CONFIG ================= */
 
 const firebaseConfig = {
   apiKey: "AIzaSyBvmqa7MUYKePUHSYq69XmhN9N7GdNvlPU",
@@ -47,21 +58,110 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-window.login = async function() {
-    try {
+/* ================= LOGIN ================= */
 
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+window.login = async function() {
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
 
         await signInWithEmailAndPassword(auth, email, password);
 
-        alert("Connexion réussie !");
-        window.location.href = "compte.html";
+        showToast("Connexion réussie ✔", "success");
+
+        setTimeout(() => {
+            window.location.href = "compte.html";
+        }, 1200);
 
     } catch (error) {
-        alert("Erreur : " + error.message);
+
+        showToast("Email ou mot de passe incorrect ❌", "error");
+        console.error(error);
+
     }
+};
+
+/* ================= RESET PASSWORD ================= */
+
+window.resetPassword = async function() {
+
+    const email = document.getElementById("email").value;
+
+    if (!email) {
+        showToast("Entre ton email d'abord 😉", "error");
+        return;
+    }
+
+    try {
+
+        await sendPasswordResetEmail(auth, email);
+
+        showToast("Email de réinitialisation envoyé 📩", "success");
+
+    } catch (error) {
+
+        showToast("Impossible d'envoyer l'email ❌", "error");
+        console.error(error);
+
+    }
+};
+
+/* ================= TOAST FUNCTION ================= */
+
+function showToast(message, type) {
+
+    const toast = document.getElementById("toast");
+
+    toast.innerText = message;
+
+    toast.classList.remove("success", "error", "shake");
+    toast.classList.add("show");
+
+    if (type === "success") {
+        toast.classList.add("success");
+    }
+
+    if (type === "error") {
+        toast.classList.add("error");
+        toast.classList.add("shake");
+    }
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
 }
+
+</script>
+
+<!-- ================= PAGE TRANSITION ================= -->
+
+<script>
+window.addEventListener("load", () => {
+    document.body.classList.add("page-loaded");
+});
+
+document.querySelectorAll("a").forEach(link => {
+
+    link.addEventListener("click", function(e) {
+
+        const href = this.getAttribute("href");
+
+        if (!href || href.startsWith("#") || href.startsWith("http")) return;
+
+        e.preventDefault();
+
+        document.body.classList.remove("page-loaded");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = href;
+        }, 400);
+
+    });
+
+});
 </script>
 
 </body>

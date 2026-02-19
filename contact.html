@@ -8,47 +8,91 @@
 </head>
 <body>
 
-    <header class="navbar">
-        <div class="logo">ReCore</div>
-        <nav>
-    <a href="index.html">Accueil</a>
-    <a href="brand.html">Brand</a>
-    <a href="produits.html">Produits</a>
-    <a href="contact.html">Contact</a>
-    <a href="compte.html">Mon compte</a>
-</nav>
+<header class="navbar">
+    <div class="logo">ReCore</div>
+    <nav>
+        <a href="index.html">Accueil</a>
+        <a href="brand.html">Brand</a>
+        <a href="produits.html">Produits</a>
+        <a href="contact.html">Contact</a>
+        <a href="compte.html">Mon compte</a>
 
-    </header>
+        <a href="panier.html" class="cart-inline">
+            🛒 <span class="cart-count" id="cart-count">0</span>
+        </a>
+    </nav>
+</header>
 
-    <section class="page-hero">
-        <h1 class="fade-in">Contact ReCore</h1>
-        <p class="fade-in delay">Prenez une décision. Parlons-en.</p>
-    </section>
+<section class="page-hero">
+    <h1 class="fade-in">Contact ReCore</h1>
+    <p class="fade-in delay">Prenez une décision. Parlons-en.</p>
+</section>
 
-    <section class="contact-section reveal">
-        <form class="contact-form">
-            <input type="text" placeholder="Votre nom" required>
-            <input type="email" placeholder="Votre email" required>
-            <textarea placeholder="Votre message" required></textarea>
-            <button type="submit" class="btn">Envoyer</button>
-        </form>
-    </section>
+<section class="contact-section reveal">
+    <form
+        class="contact-form"
+        action="https://formspree.io/f/mkovzygn"
+        method="POST"
+    >
+        <input type="text" name="name" placeholder="Votre nom" required>
+        <input type="email" name="email" placeholder="Votre email" required>
+        <textarea name="message" placeholder="Votre message" required></textarea>
 
-    <script>
-        const reveals = document.querySelectorAll(".reveal");
+        <input type="hidden" name="_subject" value="Nouveau message - ReCore">
+        <button type="submit" class="btn">Envoyer</button>
+    </form>
+</section>
 
-        window.addEventListener("scroll", () => {
-            reveals.forEach(el => {
-                const windowHeight = window.innerHeight;
-                const elementTop = el.getBoundingClientRect().top;
-                const elementVisible = 100;
+<script>
+/* ================= SCROLL REVEAL ================= */
 
-                if (elementTop < windowHeight - elementVisible) {
-                    el.classList.add("active");
-                }
-            });
-        });
-    </script>
+const reveals = document.querySelectorAll(".reveal");
+
+window.addEventListener("scroll", () => {
+    reveals.forEach(el => {
+        const windowHeight = window.innerHeight;
+        const elementTop = el.getBoundingClientRect().top;
+        const elementVisible = 100;
+
+        if (elementTop < windowHeight - elementVisible) {
+            el.classList.add("active");
+        }
+    });
+});
+
+/* ================= PAGE TRANSITION ================= */
+
+window.addEventListener("load", () => {
+    document.body.classList.add("page-loaded");
+});
+
+document.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", function(e) {
+        const href = this.getAttribute("href");
+
+        if (!href || href.startsWith("#") || href.startsWith("http")) return;
+
+        e.preventDefault();
+
+        document.body.classList.remove("page-loaded");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = href;
+        }, 400);
+    });
+});
+
+/* ================= PANIER ================= */
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function updateCartCount() {
+    document.getElementById("cart-count").innerText = cart.length;
+}
+
+updateCartCount();
+</script>
 
 </body>
 </html>

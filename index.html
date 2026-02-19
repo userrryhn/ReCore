@@ -1,68 +1,239 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>ReCore</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<title>ReCore</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <header class="navbar">
-        <div class="logo">ReCore</div>
-        <nav>
-    <a href="index.html">Accueil</a>
-    <a href="brand.html">Brand</a>
-    <a href="produits.html">Produits</a>
-    <a href="contact.html">Contact</a>
-    <a href="compte.html">Mon compte</a>
-</nav>
+<!-- ================= INTRO OVERLAY ================= -->
 
-    </header>
+<div class="intro-overlay" id="intro">
 
-    <section class="hero">
-        <div class="hero-content">
-            <h1 class="fade-in">ReCore.</h1>
-            <p class="fade-in delay">Recentrer. Décider. Avancer.</p>
-            <button class="btn fade-in delay-2" onclick="goToProducts()">
-                Découvrir
-            </button>
+    <div class="garage-container">
+
+
+
+        <div class="garage-door"></div>
+        <div class="light-behind"></div>
+
+        <!-- 🔐 SERRURE -->
+        <div class="lock-container">
+            <div class="lock"></div>
+            <img src="image/clé.png" class="key">
         </div>
-    </section>
 
-    <section class="section reveal">
-        <h2>Revenir à l’essentiel</h2>
-        <p>ReCore incarne la prise de décision audacieuse et réfléchie.</p>
-    </section>
+    </div>
 
-    <section class="section reveal">
-        <h2>Construire avec intention</h2>
-        <p>Chaque action est pensée. Chaque choix est assumé.</p>
-    </section>
+</div>
 
-    <script>
-        const reveals = document.querySelectorAll(".reveal");
+<!-- ================= NAVBAR ================= -->
 
-        window.addEventListener("scroll", () => {
-            reveals.forEach(el => {
-                const windowHeight = window.innerHeight;
-                const elementTop = el.getBoundingClientRect().top;
-                const elementVisible = 100;
+<header class="navbar">
+    <div class="logo">ReCore</div>
+    <nav>
+        <a href="index.html">Accueil</a>
+        <a href="brand.html">Brand</a>
+        <a href="produits.html">Produits</a>
+        <a href="contact.html">Contact</a>
+        <a href="compte.html">Mon compte</a>
 
-                if (elementTop < windowHeight - elementVisible) {
-                    el.classList.add("active");
-                }
-            });
-        });
+        <a href="panier.html" class="cart-inline">
+            🛒 <span class="cart-count" id="cart-count">0</span>
+        </a>
+    </nav>
+</header>
 
-        function goToProducts() {
-            document.body.classList.add("fade-out");
+<!-- ================= HERO ================= -->
 
-            setTimeout(() => {
-                window.location.href = "produits.html";
-            }, 500);
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="fade-in">ReCore.</h1>
+        <p class="fade-in delay">Recentrer. Décider. Avancer.</p>
+
+        <button class="btn fade-in delay-2" onclick="goToProducts()">
+            Découvrir
+        </button>
+    </div>
+</section>
+
+<section class="section reveal">
+    <h2>Revenir à l’essentiel</h2>
+    <p>ReCore incarne la prise de décision audacieuse et réfléchie.</p>
+</section>
+
+<section class="section reveal">
+    <h2>Construire avec intention</h2>
+    <p>Chaque action est pensée. Chaque choix est assumé.</p>
+</section>
+
+<div id="toast" class="toast"></div>
+
+<!-- ================= FIREBASE + SITE ================= -->
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBvmqa7MUYKePUHSYq69XmhN9N7GdNvlPU",
+  authDomain: "recore-f320c.firebaseapp.com",
+  projectId: "recore-f320c",
+  storageBucket: "recore-f320c.firebasestorage.app",
+  messagingSenderId: "560442114914",
+  appId: "1:560442114914:web:9c2bf7f43f3336954ca23b"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+let currentUser = null;
+
+onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+});
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function updateCartCount() {
+    document.getElementById("cart-count").innerText = cart.length;
+}
+
+updateCartCount();
+
+window.goToProducts = function() {
+    document.body.classList.add("fade-out");
+    setTimeout(() => {
+        window.location.href = "produits.html";
+    }, 500);
+};
+
+const reveals = document.querySelectorAll(".reveal");
+
+window.addEventListener("scroll", () => {
+    reveals.forEach(el => {
+        const windowHeight = window.innerHeight;
+        const elementTop = el.getBoundingClientRect().top;
+        const elementVisible = 100;
+
+        if (elementTop < windowHeight - elementVisible) {
+            el.classList.add("active");
         }
-    </script>
+    });
+});
+</script>
+
+<!-- ================= PAGE TRANSITION ================= -->
+
+<script>
+window.addEventListener("load", () => {
+    document.body.classList.add("page-loaded");
+});
+
+document.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", function(e) {
+
+        const href = this.getAttribute("href");
+        if (!href || href.startsWith("#") || href.startsWith("http")) return;
+
+        e.preventDefault();
+
+        document.body.classList.remove("page-loaded");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = href;
+        }, 400);
+    });
+});
+</script>
+<audio id="bgMusic" src="son/fortnite.mp3" loop></audio>
+<audio id="lockSound" src="son/serrure.mp3"></audio>
+<audio id="bimSound" src="son/dimdim.mp3"></audio>
+<script>
+window.addEventListener("load", function() {
+
+    const intro = document.getElementById("intro");
+    const lock = document.querySelector(".lock-container");
+    const bgMusic = document.getElementById("bgMusic");
+    const lockSound = document.getElementById("lockSound");
+    const bimSound = document.getElementById("bimSound");
+
+    if (sessionStorage.getItem("introSeen")) {
+        intro.style.display = "none";
+        return;
+    }
+
+    // Volume initial plus bas
+    bgMusic.volume = 0.25;
+
+    // Lancer musique au premier clic utilisateur
+    document.body.addEventListener("click", function startMusic() {
+        bgMusic.play().catch(()=>{});
+        document.body.removeEventListener("click", startMusic);
+    });
+
+    lock.addEventListener("click", function() {
+
+        if (intro.classList.contains("shake")) return;
+
+        intro.classList.add("shake");
+
+        /* 🔉 FADE OUT RAPIDE */
+        let fade = setInterval(() => {
+            if (bgMusic.volume > 0.02) {
+                bgMusic.volume -= 0.02;
+            } else {
+                clearInterval(fade);
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
+            }
+        }, 40);
+
+        /* 🔐 Son serrure après 1s */
+        setTimeout(() => {
+            lockSound.volume = 0.7;
+            lockSound.currentTime = 0;
+            lockSound.play();
+
+            /* 🔔 Quand serrure FINIT */
+            lockSound.onended = function() {
+                setTimeout(() => {
+                    bimSound.volume = 0.8;
+                    bimSound.currentTime = 0;
+                    bimSound.play();
+                }, 1000);
+            };
+
+        }, 1000);
+
+        /* 🚪 OUVERTURE PORTE */
+        setTimeout(() => {
+            intro.classList.add("open");
+        }, 1600);
+
+        /* 🎥 ZOOM */
+        setTimeout(() => {
+            intro.classList.add("zoom");
+        }, 4000);
+
+        /* ❌ FIN */
+        setTimeout(() => {
+            sessionStorage.setItem("introSeen", "true");
+            intro.style.display = "none";
+        }, 5500);
+
+    });
+
+});
+</script>
+
+
+
+
 
 </body>
 </html>

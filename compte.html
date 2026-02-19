@@ -12,10 +12,16 @@
     <div class="logo">ReCore</div>
     <nav>
         <a href="index.html">Accueil</a>
+        <a href="brand.html">Brand</a>
         <a href="produits.html">Produits</a>
+        <a href="contact.html">Contact</a>
         <a href="compte.html">Mon compte</a>
+        <a href="panier.html" class="cart-inline">
+            🛒 <span class="cart-count" id="cart-count">0</span>
+        </a>
     </nav>
 </header>
+
 
 <section class="page-hero">
     <h1>Mon Compte</h1>
@@ -58,11 +64,14 @@
 </section>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, updateDoc } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ================= FIREBASE CONFIG ================= */
 
 const firebaseConfig = {
   apiKey: "AIzaSyBvmqa7MUYKePUHSYq69XmhN9N7GdNvlPU",
@@ -78,6 +87,8 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let currentUser;
+
+/* ================= AUTH CHECK ================= */
 
 onAuthStateChanged(auth, async (user) => {
 
@@ -96,10 +107,10 @@ onAuthStateChanged(auth, async (user) => {
 
     if (docSnap.exists()) {
         const data = docSnap.data();
-        document.getElementById("nom").value = data.nom;
-        document.getElementById("prenom").value = data.prenom;
-        document.getElementById("adresse").value = data.adresse;
-        document.getElementById("email").value = data.email;
+        document.getElementById("nom").value = data.nom || "";
+        document.getElementById("prenom").value = data.prenom || "";
+        document.getElementById("adresse").value = data.adresse || "";
+        document.getElementById("email").value = data.email || user.email;
     }
 
     const badge = document.getElementById("email-badge");
@@ -114,6 +125,8 @@ onAuthStateChanged(auth, async (user) => {
 
 });
 
+/* ================= ENABLE EDIT ================= */
+
 window.enableEdit = function() {
 
     document.getElementById("nom").disabled = false;
@@ -123,28 +136,97 @@ window.enableEdit = function() {
     document.getElementById("saveBtn").style.display = "inline-block";
 }
 
+/* ================= SAVE PROFILE ================= */
+
 window.saveProfile = async function() {
 
-    await updateDoc(doc(db, "users", currentUser.uid), {
-        nom: document.getElementById("nom").value,
-        prenom: document.getElementById("prenom").value,
-        adresse: document.getElementById("adresse").value
-    });
+    try {
 
-    document.getElementById("nom").disabled = true;
-    document.getElementById("prenom").disabled = true;
-    document.getElementById("adresse").disabled = true;
+        await updateDoc(doc(db, "users", currentUser.uid), {
+            nom: document.getElementById("nom").value,
+            prenom: document.getElementById("prenom").value,
+            adresse: document.getElementById("adresse").value
+        });
 
-    document.getElementById("saveBtn").style.display = "none";
+        document.getElementById("nom").disabled = true;
+        document.getElementById("prenom").disabled = true;
+        document.getElementById("adresse").disabled = true;
 
-    alert("Profil mis à jour !");
+        document.getElementById("saveBtn").style.display = "none";
+
+        showToast("Profil mis à jour ✔", "success");
+
+    } catch (error) {
+
+        console.error(error);
+        showToast("Erreur lors de la mise à jour ❌", "error");
+
+    }
+
 }
+
+/* ================= LOGOUT ================= */
 
 window.logout = function() {
     signOut(auth);
     window.location.href = "login.html";
 }
+
+/* ================= TOAST FUNCTION ================= */
+
+function showToast(message, type) {
+
+    const toast = document.getElementById("toast");
+
+    toast.innerText = message;
+
+    toast.classList.remove("success", "error");
+    toast.classList.add("show");
+
+    if (type === "success") {
+        toast.classList.add("success");
+    }
+
+    if (type === "error") {
+        toast.classList.add("error");
+    }
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
+}
+
 </script>
+<script>
+window.addEventListener("load", () => {
+    document.body.classList.add("page-loaded");
+});
+
+document.querySelectorAll("a").forEach(link => {
+
+    link.addEventListener("click", function(e) {
+
+        const href = this.getAttribute("href");
+
+        if (!href || href.startsWith("#") || href.startsWith("http")) return;
+
+        e.preventDefault();
+
+        document.body.classList.remove("page-loaded");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = href;
+        }, 400);
+
+    });
+
+});
+</script>
+
+
+
+<div id="toast" class="toast">Profil mis à jour avec succès ✔</div>
 
 </body>
 </html>

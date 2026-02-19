@@ -9,72 +9,145 @@
 <body>
 
 <header class="navbar">
-<div class="logo">ReCore</div>
-<nav>
-<a href="index.html">Accueil</a>
-<a href="produits.html">Produits</a>
-<a href="login.html">Connexion</a>
-</nav>
+    <div class="logo">ReCore</div>
+    <nav>
+        <a href="index.html">Accueil</a>
+        <a href="produits.html">Produits</a>
+        <a href="login.html">Connexion</a>
+    </nav>
 </header>
 
 <section class="page-hero">
-<h1>Créer un compte</h1>
+    <h1>Créer un compte</h1>
 </section>
 
 <section class="contact-section">
-<div class="contact-form">
-<input type="text" id="nom" placeholder="Nom">
-<input type="text" id="prenom" placeholder="Prénom">
-<input type="text" id="adresse" placeholder="Adresse">
-<input type="email" id="email" placeholder="Email">
-<input type="password" id="password" placeholder="Mot de passe">
-<button class="btn" onclick="register()">Créer un compte</button>
-</div>
+    <div class="contact-form">
+
+        <input type="text" id="nom" placeholder="Nom" required>
+        <input type="text" id="prenom" placeholder="Prénom" required>
+        <input type="text" id="adresse" placeholder="Adresse" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Mot de passe" required>
+
+        <button class="btn" onclick="register()">Créer mon compte</button>
+
+    </div>
 </section>
 
+<div id="toast" class="toast"></div>
+
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } 
+import { getAuth, createUserWithEmailAndPassword } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+/* ================= FIREBASE CONFIG ================= */
+
 const firebaseConfig = {
-apiKey: "AIzaSyBvmqa7MUYKePUHSYq69XmhN9N7GdNvlPU",
-authDomain: "recore-f320c.firebaseapp.com",
-projectId: "recore-f320c",
-storageBucket: "recore-f320c.firebasestorage.app",
-messagingSenderId: "560442114914",
-appId: "1:560442114914:web:9c2bf7f43f3336954ca23b"
+  apiKey: "AIzaSyBvmqa7MUYKePUHSYq69XmhN9N7GdNvlPU",
+  authDomain: "recore-f320c.firebaseapp.com",
+  projectId: "recore-f320c",
+  storageBucket: "recore-f320c.firebasestorage.app",
+  messagingSenderId: "560442114914",
+  appId: "1:560442114914:web:9c2bf7f43f3336954ca23b"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+/* ================= REGISTER FUNCTION ================= */
+
 window.register = async function() {
 
-const nom = document.getElementById("nom").value;
-const prenom = document.getElementById("prenom").value;
-const adresse = document.getElementById("adresse").value;
-const email = document.getElementById("email").value;
-const password = document.getElementById("password").value;
+    const nom = document.getElementById("nom").value;
+    const prenom = document.getElementById("prenom").value;
+    const adresse = document.getElementById("adresse").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-const user = userCredential.user;
+    try {
 
-await setDoc(doc(db, "users", user.uid), {
-nom,
-prenom,
-adresse,
-email
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+            nom: nom,
+            prenom: prenom,
+            adresse: adresse,
+            email: email,
+            createdAt: new Date()
+        });
+
+        showToast("Compte créé avec succès ✔", "success");
+
+        setTimeout(() => {
+            window.location.href = "compte.html";
+        }, 1500);
+
+    } catch (error) {
+
+        console.error(error);
+        showToast("Erreur lors de la création ❌", "error");
+
+    }
+};
+
+/* ================= TOAST FUNCTION ================= */
+
+function showToast(message, type) {
+
+    const toast = document.getElementById("toast");
+
+    toast.innerText = message;
+
+    toast.classList.remove("success", "error", "shake");
+    toast.classList.add("show");
+
+    if (type === "success") {
+        toast.classList.add("success");
+    }
+
+    if (type === "error") {
+        toast.classList.add("error");
+        toast.classList.add("shake");
+    }
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
+}
+
+</script>
+<script>
+window.addEventListener("load", () => {
+    document.body.classList.add("page-loaded");
 });
 
-await sendEmailVerification(user);
+document.querySelectorAll("a").forEach(link => {
 
-alert("Compte créé ! Vérifie ton email avant de commander.");
-window.location.href = "login.html";
-}
+    link.addEventListener("click", function(e) {
+
+        const href = this.getAttribute("href");
+
+        if (!href || href.startsWith("#") || href.startsWith("http")) return;
+
+        e.preventDefault();
+
+        document.body.classList.remove("page-loaded");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = href;
+        }, 400);
+
+    });
+
+});
 </script>
 
 </body>
