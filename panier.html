@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -137,6 +138,32 @@
     </div>
 </div>
 
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBvmqa7MUYKePUHSYq69XmhN9N7GdNvlPU",
+  authDomain: "recore-f320c.firebaseapp.com",
+  projectId: "recore-f320c",
+  storageBucket: "recore-f320c.firebasestorage.app",
+  messagingSenderId: "560442114914",
+  appId: "1:560442114914:web:9c2bf7f43f3336954ca23b"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+window.__authUser = null;
+
+onAuthStateChanged(auth, async (user) => {
+    window.__authUser = user || null;
+    if (user) {
+        await user.reload();
+    }
+});
+</script>
+
 <script>
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
@@ -187,6 +214,23 @@ function clearCart() {
 async function checkout() {
     if (cart.length === 0) return;
 
+    const user = window.__authUser;
+
+    if (!user) {
+        showToast("Connexion requise pour payer.", "error");
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 1000);
+        return;
+    }
+
+    await user.reload();
+
+    if (!user.emailVerified) {
+        showToast("Validation email nécessaire avant paiement.", "error");
+        return;
+    }
+
     try {
         const res = await fetch("https://recore.onrender.com/create-checkout-session", {
             method: "POST",
@@ -205,6 +249,27 @@ async function checkout() {
     } catch (e) {
         alert("Impossible de contacter le serveur de paiement.");
     }
+}
+
+function showToast(message, type) {
+    const toast = document.getElementById("toast");
+
+    toast.innerText = message;
+    toast.classList.remove("success", "error", "shake");
+    toast.classList.add("show");
+
+    if (type === "success") {
+        toast.classList.add("success");
+    }
+
+    if (type === "error") {
+        toast.classList.add("error");
+        toast.classList.add("shake");
+    }
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
 }
 
 renderCart();
@@ -232,6 +297,8 @@ document.querySelectorAll("a").forEach(link => {
     });
 });
 </script>
+
+<div id="toast" class="toast"></div>
 
 </body>
 </html>
