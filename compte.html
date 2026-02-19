@@ -5,6 +5,21 @@
 <title>Mon Compte | ReCore</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="css/style.css">
+
+<style>
+.resend-btn {
+    padding: 6px 12px;
+    border-radius: 10px;
+    border: 1px solid #3a3a44;
+    background: #2a2a33;
+    color: #f5f5f7;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.resend-btn:hover { opacity: 0.85; }
+.resend-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
 </head>
 <body>
 
@@ -21,7 +36,6 @@
         </a>
     </nav>
 </header>
-
 
 <section class="page-hero">
     <h1>Mon Compte</h1>
@@ -51,6 +65,9 @@
             <div class="email-container">
                 <input type="email" id="email" disabled>
                 <span id="email-badge" class="badge"></span>
+                <button id="resendBtn" class="resend-btn" style="display:none;" onclick="resendVerification()">
+                    Renvoyer
+                </button>
             </div>
         </div>
 
@@ -64,14 +81,11 @@
 </section>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } 
+import { getAuth, onAuthStateChanged, signOut, sendEmailVerification } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, updateDoc } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-/* ================= FIREBASE CONFIG ================= */
 
 const firebaseConfig = {
   apiKey: "AIzaSyBvmqa7MUYKePUHSYq69XmhN9N7GdNvlPU",
@@ -88,10 +102,7 @@ const db = getFirestore(app);
 
 let currentUser;
 
-/* ================= AUTH CHECK ================= */
-
 onAuthStateChanged(auth, async (user) => {
-
     if (!user) {
         window.location.href = "login.html";
         return;
@@ -114,34 +125,30 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     const badge = document.getElementById("email-badge");
+    const resendBtn = document.getElementById("resendBtn");
+
+    badge.classList.remove("verified", "not-verified");
 
     if (user.emailVerified) {
         badge.innerText = "Vérifié";
         badge.classList.add("verified");
+        resendBtn.style.display = "none";
     } else {
         badge.innerText = "Non vérifié";
         badge.classList.add("not-verified");
+        resendBtn.style.display = "inline-block";
     }
-
 });
 
-/* ================= ENABLE EDIT ================= */
-
 window.enableEdit = function() {
-
     document.getElementById("nom").disabled = false;
     document.getElementById("prenom").disabled = false;
     document.getElementById("adresse").disabled = false;
-
     document.getElementById("saveBtn").style.display = "inline-block";
-}
-
-/* ================= SAVE PROFILE ================= */
+};
 
 window.saveProfile = async function() {
-
     try {
-
         await updateDoc(doc(db, "users", currentUser.uid), {
             nom: document.getElementById("nom").value,
             prenom: document.getElementById("prenom").value,
@@ -151,61 +158,60 @@ window.saveProfile = async function() {
         document.getElementById("nom").disabled = true;
         document.getElementById("prenom").disabled = true;
         document.getElementById("adresse").disabled = true;
-
         document.getElementById("saveBtn").style.display = "none";
 
         showToast("Profil mis à jour ✔", "success");
-
     } catch (error) {
-
         console.error(error);
         showToast("Erreur lors de la mise à jour ❌", "error");
-
     }
+};
 
-}
+window.resendVerification = async function() {
+    try {
+        const resendBtn = document.getElementById("resendBtn");
+        resendBtn.disabled = true;
 
-/* ================= LOGOUT ================= */
+        await sendEmailVerification(currentUser);
+        showToast("Email de vérification renvoyé 📩", "success");
+
+        setTimeout(() => {
+            resendBtn.disabled = false;
+        }, 30000);
+    } catch (error) {
+        console.error(error);
+        showToast("Impossible de renvoyer l'email ❌", "error");
+        document.getElementById("resendBtn").disabled = false;
+    }
+};
 
 window.logout = function() {
     signOut(auth);
     window.location.href = "login.html";
-}
-
-/* ================= TOAST FUNCTION ================= */
+};
 
 function showToast(message, type) {
-
     const toast = document.getElementById("toast");
-
     toast.innerText = message;
-
     toast.classList.remove("success", "error");
     toast.classList.add("show");
 
-    if (type === "success") {
-        toast.classList.add("success");
-    }
-
-    if (type === "error") {
-        toast.classList.add("error");
-    }
+    if (type === "success") toast.classList.add("success");
+    if (type === "error") toast.classList.add("error");
 
     setTimeout(() => {
         toast.classList.remove("show");
     }, 2500);
 }
-
 </script>
+
 <script>
 window.addEventListener("load", () => {
     document.body.classList.add("page-loaded");
 });
 
 document.querySelectorAll("a").forEach(link => {
-
     link.addEventListener("click", function(e) {
-
         const href = this.getAttribute("href");
 
         if (!href || href.startsWith("#") || href.startsWith("http")) return;
@@ -218,15 +224,10 @@ document.querySelectorAll("a").forEach(link => {
         setTimeout(() => {
             window.location.href = href;
         }, 400);
-
     });
-
 });
 </script>
 
-
-
-<div id="toast" class="toast">Profil mis à jour avec succès ✔</div>
-
+<div id="toast" class="toast"></div>
 </body>
 </html>

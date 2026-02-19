@@ -23,7 +23,6 @@
 
 <section class="contact-section">
     <div class="contact-form">
-
         <input type="text" id="nom" placeholder="Nom" required>
         <input type="text" id="prenom" placeholder="Prénom" required>
         <input type="text" id="adresse" placeholder="Adresse" required>
@@ -31,18 +30,16 @@
         <input type="password" id="password" placeholder="Mot de passe" required>
 
         <button class="btn" onclick="register()">Créer mon compte</button>
-
     </div>
 </section>
 
 <div id="toast" class="toast"></div>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } 
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc } 
+import { getFirestore, doc, setDoc, serverTimestamp } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* ================= FIREBASE CONFIG ================= */
@@ -63,46 +60,63 @@ const db = getFirestore(app);
 /* ================= REGISTER FUNCTION ================= */
 
 window.register = async function() {
-
-    const nom = document.getElementById("nom").value;
-    const prenom = document.getElementById("prenom").value;
-    const adresse = document.getElementById("adresse").value;
-    const email = document.getElementById("email").value;
+    const nom = document.getElementById("nom").value.trim();
+    const prenom = document.getElementById("prenom").value.trim();
+    const adresse = document.getElementById("adresse").value.trim();
+    const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
 
-    try {
+    if (!nom || !prenom || !adresse || !email || !password) {
+        showToast("Merci de remplir tous les champs.", "error");
+        return;
+    }
 
+    try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
         await setDoc(doc(db, "users", user.uid), {
-            nom: nom,
-            prenom: prenom,
-            adresse: adresse,
-            email: email,
-            createdAt: new Date()
+            nom,
+            prenom,
+            adresse,
+            email,
+            createdAt: serverTimestamp()
         });
 
-        showToast("Compte créé avec succès ✔", "success");
+        await sendEmailVerification(user);
+
+        showToast("Compte créé ✔ Vérifie ton email pour confirmer.", "success");
 
         setTimeout(() => {
             window.location.href = "compte.html";
-        }, 1500);
+        }, 1600);
 
     } catch (error) {
-
         console.error(error);
-        showToast("Erreur lors de la création ❌", "error");
 
+        if (error.code === "auth/email-already-in-use") {
+            showToast("Cet email est déjà utilisé.", "error");
+            return;
+        }
+
+        if (error.code === "auth/invalid-email") {
+            showToast("Email invalide.", "error");
+            return;
+        }
+
+        if (error.code === "auth/weak-password") {
+            showToast("Mot de passe trop faible (6 caractères min).", "error");
+            return;
+        }
+
+        showToast("Erreur lors de la création ❌", "error");
     }
 };
 
 /* ================= TOAST FUNCTION ================= */
 
 function showToast(message, type) {
-
     const toast = document.getElementById("toast");
-
     toast.innerText = message;
 
     toast.classList.remove("success", "error", "shake");
@@ -121,17 +135,15 @@ function showToast(message, type) {
         toast.classList.remove("show");
     }, 2500);
 }
-
 </script>
+
 <script>
 window.addEventListener("load", () => {
     document.body.classList.add("page-loaded");
 });
 
 document.querySelectorAll("a").forEach(link => {
-
     link.addEventListener("click", function(e) {
-
         const href = this.getAttribute("href");
 
         if (!href || href.startsWith("#") || href.startsWith("http")) return;
@@ -144,9 +156,7 @@ document.querySelectorAll("a").forEach(link => {
         setTimeout(() => {
             window.location.href = href;
         }, 400);
-
     });
-
 });
 </script>
 
