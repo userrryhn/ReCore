@@ -188,7 +188,7 @@ async function checkout() {
     if (cart.length === 0) return;
 
     try {
-        const res = await fetch("http://localhost:4242/create-checkout-session", {
+        const res = await fetch("https://recore.onrender.com/create-checkout-session", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ cart })
