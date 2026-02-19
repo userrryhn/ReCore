@@ -173,7 +173,7 @@ window.resendVerification = async function() {
         resendBtn.disabled = true;
 
         await sendEmailVerification(currentUser);
-        showToast("Email de vérification renvoyé 📩", "success");
+        showToast("Email de vérification renvoyé 📩 (Peut-être dans les spams)", "success");
 
         setTimeout(() => {
             resendBtn.disabled = false;
